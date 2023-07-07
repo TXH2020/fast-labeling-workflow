@@ -3,7 +3,7 @@
 import os
 import json
 import urllib.request
-
+import pickle
 from detectron2 import model_zoo
 from detectron2.engine import DefaultTrainer, DefaultPredictor
 from detectron2.config import get_cfg
@@ -69,7 +69,7 @@ def train_model(dataset):
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url('COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml')  # Let training initialize from model zoo
     cfg.SOLVER.IMS_PER_BATCH = 2 # 4
     cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
-    cfg.SOLVER.MAX_ITER = 1000    # 300 iterations seems good enough for this toy dataset; you may need to train longer for a practical dataset
+    cfg.SOLVER.MAX_ITER = 1500    # 300 iterations seems good enough for this toy dataset; you may need to train longer for a practical dataset
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 128   # faster, and good enough for this toy dataset (default: 512)
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(dataset.categories)  # number of categories
 #     cfg.MODEL.DEVICE = 'cuda'
@@ -85,6 +85,7 @@ def train_model(dataset):
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7   # set the testing threshold for this model
     cfg.DATASETS.TEST = ('my_dataset', )
     cfg.TEST.DETECTIONS_PER_IMAGE = 1000
+    pickle.dump(cfg,open('cfg.pkl','wb'))
     predictor = DefaultPredictor(cfg)
     model = Model(predictor)
 
